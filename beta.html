@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog Cá Nhân</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="text-center p-4">
+  <!-- Đăng nhập -->
+  <div class="container" id="login-box">
+    <h2>Đăng Nhập</h2>
+    <input type="text" id="username" class="form-control mb-2" placeholder="Tên đăng nhập">
+    <input type="password" id="password" class="form-control mb-2" placeholder="Mật khẩu">
+    <button class="btn btn-primary w-100" onclick="login()">Đăng Nhập</button>
+    <p id="error" class="text-danger mt-2"></p>
+  </div>
+
+  <!-- Sau khi đăng nhập -->
+  <div id="user-section" class="container d-none">
+    <h2 id="welcome-message"></h2>
+    <button class="btn btn-danger mb-3" onclick="logout()">Đăng Xuất</button>
+
+    <div class="mb-2">
+      <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm bài viết..." oninput="loadPosts()">
+    </div>
+
+    <textarea id="postContent" class="form-control mb-2" placeholder="Viết bài..."></textarea>
+    <input type="text" id="postTags" class="form-control mb-2" placeholder="Thẻ (tags, cách nhau bằng dấu phẩy)">
+    <input type="text" id="postCategory" class="form-control mb-2" placeholder="Chủ đề (category)">
+    <input type="file" id="postAttachment" class="form-control mb-2" accept="image/*,.pdf,.doc,.docx">
+
+    <button id="postButton" class="btn btn-success mb-3" onclick="submitPost()">Đăng Bài</button>
+
+    <div id="posts"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const accounts = { "user1": "pass1", "user2": "pass2", "admin": "adminpass" };
+    let editingPostId = null;
+
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      if (accounts[username] && accounts[username] === password) {
+        sessionStorage.setItem("loggedInUser", username);
+        displayUserPage(username);
+      } else {
+        document.getElementById("error").textContent = "Sai tên đăng nhập hoặc mật khẩu!";
+      }
+    }
+
+    function displayUserPage(username) {
+      document.getElementById("login-box").classList.add("d-none");
+      document.getElementById("user-section").classList.remove("d-none");
+      document.getElementById("welcome-message").textContent = `Chào mừng, ${username}!`;
+      const savedDraft = sessionStorage.getItem("draft");
+      if (savedDraft) document.getElementById("postContent").value = savedDraft;
+      loadPosts();
+    }
+
+    function logout() {
+      sessionStorage.removeItem("loggedInUser");
+      sessionStorage.removeItem("draft");
+      window.location.replace("index.html");
+    }
+
+    function submitPost() {
+      const content = document.getElementById("postContent").value.trim();
+      const tags = document.getElementById("postTags").value.trim();
+      const category = document.getElementById("postCategory").value.trim();
+      const fileInput = document.getElementById("postAttachment");
+      const file = fileInput.files[0];
+      const user = sessionStorage.getItem("loggedInUser");
+      if (!content || !user) return;
+
+      let posts = JSON.parse(sessionStorage.getItem(`posts_${user}`)) || [];
+      let attachmentUrl = null;
+      let attachmentName = null;
+
+      if (file) {
+        attachmentUrl = URL.createObjectURL(file);
+        attachmentName = file.name;
+      }
+
+      if (editingPostId) {
+        posts = posts.map(post => post.id === editingPostId ? {
+          ...post, content, tags, category, attachmentUrl, attachmentName
+        } : post);
+        editingPostId = null;
+        document.getElementById("postButton").textContent = "Đăng Bài";
+      } else {
+        posts.push({
+          id: Date.now(),
+          user,
+          author: user,
+          content,
+          tags,
+          category,
+          attachmentUrl,
+          attachmentName,
+          time: new Date().toLocaleString()
+        });
+      }
+
+      sessionStorage.setItem(`posts_${user}`, JSON.stringify(posts));
+      sessionStorage.removeItem("draft");
+      document.getElementById("postContent").value = "";
+      document.getElementById("postTags").value = "";
+      document.getElementById("postCategory").value = "";
+      fileInput.value = "";
+      loadPosts();
+    }
+
+    function loadPosts() {
+      const currentUser = sessionStorage.getItem("loggedInUser");
+      let posts = JSON.parse(sessionStorage.getItem(`posts_${currentUser}`)) || [];
+      const postContainer = document.getElementById("posts");
+      const keyword = document.getElementById("searchInput").value.toLowerCase();
+
+      postContainer.innerHTML = "";
+      posts.sort((a, b) => b.id - a.id);
+      posts = posts.filter(post => post.content.toLowerCase().includes(keyword) || post.tags?.toLowerCase().includes(keyword) || post.category?.toLowerCase().includes(keyword));
+
+      posts.forEach(post => {
+        const postDiv = document.createElement("div");
+        postDiv.classList.add("border", "p-3", "mt-2", "text-start");
+
+        postDiv.innerHTML = `
+          <p><strong>${post.author}</strong> (${post.time})</p>
+          <p>${post.content}</p>
+          <p><small><strong>Chủ đề:</strong> ${post.category || "Không có"} | <strong>Tags:</strong> ${post.tags || "Không có"}</small></p>
+          ${post.attachmentUrl ? `<p><strong>Tệp đính kèm:</strong> <a href="${post.attachmentUrl}" target="_blank">${post.attachmentName}</a></p>` : ""}
+        `;
+
+        const btnGroup = document.createElement("div");
+        btnGroup.classList.add("d-flex", "gap-2");
+
+        const editBtn = document.createElement("button");
+        editBtn.classList.add("btn", "btn-warning");
+        editBtn.textContent = "Sửa";
+        editBtn.onclick = () => editPost(post.id);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.classList.add("btn", "btn-danger");
+        deleteBtn.textContent = "Xóa";
+        deleteBtn.onclick = () => deletePost(post.id);
+
+        btnGroup.appendChild(editBtn);
+        btnGroup.appendChild(deleteBtn);
+        postDiv.appendChild(btnGroup);
+
+        postContainer.appendChild(postDiv);
+      });
+    }
+
+    function deletePost(postId) {
+      const user = sessionStorage.getItem("loggedInUser");
+      let posts = JSON.parse(sessionStorage.getItem(`posts_${user}`)) || [];
+      posts = posts.filter(post => post.id !== postId);
+      sessionStorage.setItem(`posts_${user}`, JSON.stringify(posts));
+      loadPosts();
+    }
+
+    function editPost(postId) {
+      const user = sessionStorage.getItem("loggedInUser");
+      const posts = JSON.parse(sessionStorage.getItem(`posts_${user}`)) || [];
+      const post = posts.find(p => p.id === postId);
+      if (post) {
+        document.getElementById("postContent").value = post.content;
+        document.getElementById("postTags").value = post.tags || "";
+        document.getElementById("postCategory").value = post.category || "";
+        editingPostId = post.id;
+        document.getElementById("postButton").textContent = "Cập nhật";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    document.getElementById("postContent").addEventListener("input", function () {
+      sessionStorage.setItem("draft", this.value);
+    });
+
+    window.onload = function () {
+      const loggedInUser = sessionStorage.getItem("loggedInUser");
+      if (loggedInUser && accounts[loggedInUser]) {
+        displayUserPage(loggedInUser);
+      }
+    };
+  </script>
+</body>
+        </html>
