@@ -37,7 +37,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-const accounts = { "user1": "pass1", "user2": "pass2", "admin": "adminpass" };
+    const accounts = { "user1": "pass1", "user2": "pass2", "admin": "adminpass" };
 let editingPostId = null;
 
 function login() {
@@ -68,9 +68,10 @@ function logout() {
 
 function getAllPosts() {
   let allPosts = [];
-  for (let key in sessionStorage) {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
     if (key.startsWith("posts_")) {
-      const userPosts = JSON.parse(sessionStorage.getItem(key));
+      const userPosts = JSON.parse(localStorage.getItem(key)) || [];
       if (Array.isArray(userPosts)) {
         allPosts = allPosts.concat(userPosts);
       }
@@ -79,8 +80,12 @@ function getAllPosts() {
   return allPosts;
 }
 
+function getUserPosts(username) {
+  return JSON.parse(localStorage.getItem(`posts_${username}`)) || [];
+}
+
 function saveUserPosts(username, posts) {
-  sessionStorage.setItem(`posts_${username}`, JSON.stringify(posts));
+  localStorage.setItem(`posts_${username}`, JSON.stringify(posts));
 }
 
 function submitPost() {
@@ -92,7 +97,7 @@ function submitPost() {
   const user = sessionStorage.getItem("loggedInUser");
   if (!content) return;
 
-  let posts = JSON.parse(sessionStorage.getItem(`posts_${user}`)) || [];
+  let posts = getUserPosts(user);
   let attachmentUrl = null;
   let attachmentName = null;
 
@@ -138,7 +143,11 @@ function loadPosts() {
 
   postContainer.innerHTML = "";
   posts.sort((a, b) => b.id - a.id);
-  posts = posts.filter(post => post.content.toLowerCase().includes(keyword) || post.tags?.toLowerCase().includes(keyword) || post.category?.toLowerCase().includes(keyword));
+  posts = posts.filter(post =>
+    post.content.toLowerCase().includes(keyword) ||
+    post.tags?.toLowerCase().includes(keyword) ||
+    post.category?.toLowerCase().includes(keyword)
+  );
 
   posts.forEach(post => {
     const postDiv = document.createElement("div");
@@ -176,7 +185,7 @@ function loadPosts() {
 
 function deletePost(postId) {
   const user = sessionStorage.getItem("loggedInUser");
-  let posts = JSON.parse(sessionStorage.getItem(`posts_${user}`)) || [];
+  let posts = getUserPosts(user);
   posts = posts.filter(post => post.id !== postId);
   saveUserPosts(user, posts);
   loadPosts();
@@ -184,7 +193,7 @@ function deletePost(postId) {
 
 function editPost(postId) {
   const user = sessionStorage.getItem("loggedInUser");
-  const posts = JSON.parse(sessionStorage.getItem(`posts_${user}`)) || [];
+  const posts = getUserPosts(user);
   const post = posts.find(p => p.id === postId);
   if (post) {
     document.getElementById("postContent").value = post.content;
