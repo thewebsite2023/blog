@@ -81,6 +81,14 @@
             font-size: 0.85em;
         }
 
+        .info-message {
+            color: blue;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.85em;
+            display: none;
+        }
+
         .form-navigation {
             text-align: center;
             margin-top: 15px;
@@ -122,6 +130,7 @@
                 <button type="submit">Đăng nhập</button>
                 <div class="error-message" id="loginError"></div>
                 <div class="success-message" id="loginSuccess"></div>
+                <div class="info-message" id="loginInfoLogin" style="color: orange; margin-top: 10px; text-align: center; font-size: 0.85em; display: none;"></div>
             </form>
             <div class="form-navigation">
                 <a href="#" id="forgotPasswordLink">Quên mật khẩu?</a> |
@@ -143,6 +152,7 @@
                 <button type="submit">Đăng ký</button>
                 <div class="error-message" id="signupError"></div>
                 <div class="success-message" id="signupSuccess"></div>
+                <div class="info-message" id="signupInfoSignup" style="color: blue; margin-top: 10px; text-align: center; font-size: 0.85em; display: none;"></div>
             </form>
             <div class="form-navigation">
                 <a href="#" id="backToLoginFromSignup">Quay lại đăng nhập</a>
@@ -168,7 +178,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
@@ -189,6 +199,7 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const loginErrorDiv = document.getElementById('loginError');
         const loginSuccessDiv = document.getElementById('loginSuccess');
+        const loginInfoLoginDiv = document.getElementById('loginInfoLogin');
         const signupLink = document.getElementById('signupLink');
         const forgotPasswordLink = document.getElementById('forgotPasswordLink');
 
@@ -198,6 +209,7 @@
         const signupPasswordInput = document.getElementById('signupPassword');
         const signupErrorDiv = document.getElementById('signupError');
         const signupSuccessDiv = document.getElementById('signupSuccess');
+        const signupInfoSignupDiv = document.getElementById('signupInfoSignup');
         const backToLoginFromSignup = document.getElementById('backToLoginFromSignup');
 
         const passwordResetFormDiv = document.getElementById('passwordResetForm');
@@ -217,16 +229,29 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                console.log('Đăng ký thành công:', user);
+                console.log('Đăng ký thành công, gửi email xác minh:', user);
                 signupErrorDiv.textContent = '';
-                signupSuccessDiv.textContent = 'Đăng ký thành công!';
-                // Optionally redirect or update UI
-                loginContainer.style.display = 'block';
-                signupFormDiv.style.display = 'none';
+                signupSuccessDiv.textContent = 'Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản.';
+
+                // Gửi email xác minh
+                await sendEmailVerification(auth.currentUser);
+
+                // Hiển thị thông báo cho người dùng
+                signupInfoSignupDiv.textContent = 'Một email xác minh đã được gửi đến địa chỉ của bạn. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết để kích hoạt tài khoản.';
+                signupInfoSignupDiv.style.display = 'block';
+
+                // Chuyển về trang đăng nhập sau khi thông báo
+                setTimeout(() => {
+                    loginContainer.style.display = 'block';
+                    signupFormDiv.style.display = 'none';
+                    signupInfoSignupDiv.style.display = 'none'; // Ẩn thông báo sau một khoảng thời gian
+                    signupSuccessDiv.textContent = '';
+                }, 3000); // Hiển thị thông báo trong 3 giây
             } catch (error) {
                 console.error('Lỗi đăng ký:', error.code, error.message);
                 signupErrorDiv.textContent = getErrorMessage(error.code);
                 signupSuccessDiv.textContent = '';
+                signupInfoSignupDiv.style.display = 'none';
             }
         }
 
@@ -237,13 +262,29 @@
                 const user = userCredential.user;
                 console.log('Đăng nhập thành công:', user);
                 loginErrorDiv.textContent = '';
-                loginSuccessDiv.textContent = 'Đăng nhập thành công!';
-                // Redirect to your main application page here
+                loginSuccessDiv.textContent = '';
+                loginInfoLoginDiv.style.display = 'none';
+
+                if (!user.emailVerified) {
+                    loginErrorDiv.textContent = 'Email của bạn chưa được xác minh. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết xác minh.';
+                    loginInfoLoginDiv.textContent = 'Chưa xác minh email.';
+                    loginInfoLoginDiv.style.color = 'orange';
+                    loginInfoLoginDiv.style.display = 'block';
+                    return; // Ngăn không cho chuyển hướng hoặc thực hiện hành động sau đăng nhập
+                }
+
+                // Redirect to your main application page here if email is verified
                 // window.location.href = '/dashboard';
+                loginSuccessDiv.textContent = 'Đăng nhập thành công!';
+                loginContainer.style.display = 'block'; // Vẫn hiển thị trang đăng nhập (bạn có thể thay đổi)
+                // Có thể ẩn container đăng nhập và hiển thị nội dung chính của ứng dụng tại đây
+                // loginContainer.style.display = 'none';
+                // document.getElementById('mainAppContent').style.display = 'block';
             } catch (error) {
                 console.error('Lỗi đăng nhập:', error.code, error.message);
                 loginErrorDiv.textContent = getErrorMessage(error.code);
                 loginSuccessDiv.textContent = '';
+                loginInfoLoginDiv.style.display = 'none';
             }
         }
 
