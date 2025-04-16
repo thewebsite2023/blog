@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+1<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -500,6 +500,26 @@ document.querySelectorAll("[data-switch]").forEach((btn) => {
     const target = btn.getAttribute("data-switch");
     showSection(target);
   });
+});
+    document.addEventListener('DOMContentLoaded', () => {
+  const showForm = (formIdToShow) => {
+    const forms = document.querySelectorAll('.auth-form');
+    forms.forEach(form => {
+      form.style.display = form.id === formIdToShow ? 'block' : 'none';
+    });
+  };
+
+  // Gắn sự kiện chuyển form
+  document.querySelectorAll('[data-show-form]').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetFormId = button.getAttribute('data-show-form');
+      showForm(targetFormId);
+    });
+  });
+
+  // Mặc định hiển thị form đăng nhập khi tải trang
+  showForm('loginForm');
 });
 </script>
 </body>
