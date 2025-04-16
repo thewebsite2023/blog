@@ -331,21 +331,21 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, updateEmail, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
+    authDomain: "webpage-news.firebaseapp.com",
+    projectId: "webpage-news",
+    storageBucket: "webpage-news.firebasestorage.app",
+    messagingSenderId: "95738658476",
+    appId: "1:95738658476:web:ca38f584a24b71063d6909",
+    measurementId: "G-3KJR1G7EXF"
+  };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
-            authDomain: "webpage-news.firebaseapp.com",
-            projectId: "webpage-news",
-            storageBucket: "webpage-news.firebasestorage.app",
-            messagingSenderId: "95738658476",
-            appId: "1:95738658476:web:ca38f584a24b71063d6909",
-            measurementId: "G-3KJR1G7EXF"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
 
         const loginFormContainer = document.getElementById('login-form');
         const signupFormContainer = document.getElementById('signup-form');
