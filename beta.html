@@ -329,283 +329,178 @@
             </div>
         </div>
     </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  updateEmail,
+  updatePassword,
+  deleteUser,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, updateEmail, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
-            authDomain: "webpage-news.firebaseapp.com",
-            projectId: "webpage-news",
-            storageBucket: "webpage-news.firebasestorage.app",
-            messagingSenderId: "95738658476",
-            appId: "1:95738658476:web:ca38f584a24b71063d6909",
-            measurementId: "G-3KJR1G7EXF"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyARzDeEJZRo5syvUO_gwuzKcMMkgyQg1S4",
+  authDomain: "webpage-news.firebaseapp.com",
+  projectId: "webpage-news",
+  storageBucket: "webpage-news.appspot.com",
+  messagingSenderId: "181822354730",
+  appId: "1:181822354730:web:34186300ba6462f5ff9a53",
+  databaseURL: "https://webpage-news-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
 
-        const loginFormContainer = document.getElementById('login-form');
-        const signupFormContainer = document.getElementById('signup-form');
-        const forgotPasswordFormContainer = document.getElementById('forgot-password-form');
-        const accountInfoDiv = document.getElementById('accountInfo');
-        const updateEmailFormDiv = document.getElementById('updateEmailForm');
-        const changePasswordFormDiv = document.getElementById('changePasswordForm');
+// Helper
+function showSection(sectionId) {
+  document.querySelectorAll(".form-section").forEach((section) => {
+    section.style.display = "none";
+  });
+  document.getElementById(sectionId).style.display = "block";
+}
 
-        const showSignupLink = document.getElementById('showSignupForm');
-        const showForgotPasswordLink = document.getElementById('showForgotPasswordForm');
-        const showLoginFormFromSignupLink = document.getElementById('showLoginFormFromSignup');
-        const showLoginFormFromResetLink = document.getElementById('showLoginFormFromReset');
-        const updateEmailButton = document.getElementById('updateEmailButton');
-        const changePasswordButton = document.getElementById('changePasswordButton');
-        const logoutButton = document.getElementById('logoutButton');
-        const deleteAccountButton = document.getElementById('deleteAccountButton');
-        const newEmailInput = document.getElementById('newEmail');
-        const showAccountInfoFromUpdateEmailLink = document.getElementById('showAccountInfoFromUpdateEmail');
-        const showAccountInfoFromChangePasswordLink = document.getElementById('showAccountInfoFromChangePassword');
-        const backToAccountInfoButton = document.getElementById('backToAccountInfo');
+function showAccountInfo(user) {
+  document.getElementById("accountEmail").textContent = user.email;
+  document.getElementById("accountSection").style.display = "block";
+  showSection("accountSection");
+}
 
-        // Function to hide all forms except the one to show
-        function hideAllForms() {
-            loginFormContainer.style.display = 'none';
-            signupFormContainer.style.display = 'none';
-            forgotPasswordFormContainer.style.display = 'none';
-            accountInfoDiv.style.display = 'none';
-            updateEmailFormDiv.style.display = 'none';
-            changePasswordFormDiv.style.display = 'none';
-        }
+// Đăng ký
+document.getElementById('signupSubmitForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    showAccountInfo(userCredential.user);
+  } catch (error) {
+    document.getElementById('signupError').textContent = error.message;
+  }
+});
 
-        // Event listeners for navigation
-        showSignupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            signupFormContainer.style.display = 'block';
-        });
+// Đăng nhập
+document.getElementById('loginSubmitForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    showAccountInfo(userCredential.user);
+  } catch (error) {
+    document.getElementById('loginError').textContent = error.message;
+  }
+});
 
-        showForgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            forgotPasswordFormContainer.style.display = 'block';
-        });
+// Khôi phục mật khẩu
+document.getElementById('resetSubmitForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('resetEmail').value;
+  try {
+    await sendPasswordResetEmail(auth, email);
+    document.getElementById('resetSuccess').textContent = "Email khôi phục đã được gửi!";
+  } catch (error) {
+    document.getElementById('resetError').textContent = error.message;
+  }
+});
 
-        showLoginFormFromSignupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            loginFormContainer.style.display = 'block';
-        });
+// Đăng xuất
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await signOut(auth);
+  showSection("loginForm");
+});
 
-        showLoginFormFromResetLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            loginFormContainer.style.display = 'block';
-        });
+// Đổi email
+document.getElementById('changeEmailSubmitForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const newEmail = document.getElementById('newEmail').value;
+  if (auth.currentUser) {
+    try {
+      await updateEmail(auth.currentUser, newEmail);
+      alert("Đổi email thành công!");
+      showAccountInfo(auth.currentUser);
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+});
 
-        showAccountInfoFromUpdateEmailLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            updateEmailFormDiv.style.display = 'none';
-            accountInfoDiv.style.display = 'block';
-            backToAccountInfoButton.style.display = 'none';
-        });
+// Đổi mật khẩu
+document.getElementById('changePasswordSubmitForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const newPassword = document.getElementById('newPassword').value;
+  if (auth.currentUser) {
+    try {
+      await updatePassword(auth.currentUser, newPassword);
+      alert("Đổi mật khẩu thành công!");
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+});
 
-        showAccountInfoFromChangePasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            changePasswordFormDiv.style.display = 'none';
-            accountInfoDiv.style.display = 'block';
-            backToAccountInfoButton.style.display = 'none';
-        });
+// Xóa tài khoản
+document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
+  if (auth.currentUser && confirm("Bạn có chắc muốn xóa tài khoản?")) {
+    try {
+      await deleteUser(auth.currentUser);
+      alert("Tài khoản đã bị xóa.");
+      showSection("loginForm");
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+});
 
-        backToAccountInfoButton.addEventListener('click', () => {
-            hideAllForms();
-            accountInfoDiv.style.display = 'block';
-            backToAccountInfoButton.style.display = 'none';
-        });
+// Lưu lịch sử truy cập bài viết
+function saveAccessHistory(postId) {
+  const user = auth.currentUser;
+  if (user) {
+    const timestamp = new Date().toISOString();
+    const userHistoryRef = ref(database, `history/${user.uid}`);
+    push(userHistoryRef, {
+      postId: postId,
+      timestamp: timestamp
+    });
+  }
+}
 
-        // Function to show account info and hide other forms
-        function showAccountInfo(user) {
-            hideAllForms();
-            accountInfoDiv.style.display = 'block';
-            document.getElementById('accountEmail').textContent = user.email;
-            document.getElementById('currentEmail').textContent = user.email;
-        }
+// Google đăng nhập (tuỳ chọn thêm)
+document.getElementById("googleLoginBtn")?.addEventListener("click", async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    showAccountInfo(result.user);
+  } catch (error) {
+    alert(error.message);
+  }
+});
 
-        // Function to handle user logout
-        logoutButton.addEventListener('click', async () => {
-            await signOut(auth);
-            hideAllForms();
-            loginFormContainer.style.display = 'block';
-        });
+// Tự động cập nhật trạng thái đăng nhập
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    showAccountInfo(user);
+  } else {
+    showSection("loginForm");
+  }
+});
 
-        // Function to delete user account
-        deleteAccountButton.addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    await deleteUser(user);
-                    alert('Tài khoản đã được xóa.');
-                    hideAllForms();
-                    loginFormContainer.style.display = 'block';
-                }
-                catch (error) {
-                    alert('Lỗi khi xóa tài khoản: ' + error.message);
-                }
-            }
-        });
-
-        // Function to show update email form
-        updateEmailButton.addEventListener('click', () => {
-            hideAllForms();
-            updateEmailFormDiv.style.display = 'block';
-            backToAccountInfoButton.style.display = 'block';
-        });
-
-        // Function to handle email update
-        document.getElementById('updateEmailSubmitForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newEmail = newEmailInput.value;
-            const user = auth.currentUser;
-            if (user && newEmail) {
-                try {
-                    await updateEmail(user, newEmail);
-                    alert('Cập nhật email thành công!');
-                    document.getElementById('currentEmail').textContent = newEmail;
-                    updateEmailFormDiv.style.display = 'none';
-                    accountInfoDiv.style.display = 'block';
-                    backToAccountInfoButton.style.display = 'none';
-                } catch (error) {
-                    alert('Lỗi khi cập nhật email: ' + error.message);
-                }
-            }
-        });
-
-        // Function to show change password form
-        changePasswordButton.addEventListener('click', () => {
-            hideAllForms();
-            changePasswordFormDiv.style.display = 'block';
-            backToAccountInfoButton.style.display = 'block';
-        });
-
-        // Function to handle password change
-        document.getElementById('changePasswordSubmitForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const currentPassword = document.getElementById('currentPassword').value; // Still get the current password
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            const user = auth.currentUser;
-
-            if (!user) {
-                alert('Không có người dùng nào đăng nhập.');
-                return;
-            }
-
-            if (newPassword !== confirmNewPassword) {
-                document.getElementById('changePasswordError').textContent = 'Mật khẩu mới và xác nhận không khớp.';
-                document.getElementById('changePasswordSuccess').textContent = '';
-                return;
-            }
-
-            if (newPassword.length < 6) {
-                document.getElementById('changePasswordError').textContent = 'Mật khẩu mới phải có ít nhất 6 ký tự.';
-                document.getElementById('changePasswordSuccess').textContent = '';
-                return;
-            }
-
-            try {
-                // Note: It's highly recommended to re-authenticate the user
-                // before allowing a password change in a production application.
-                // This usually involves prompting the user for their current password
-                // and verifying it server-side.
-
-                // For this simplified example, we'll proceed with the password update
-                // without explicit re-authentication in the frontend.
-
-                await updatePassword(user, newPassword);
-                alert('Đổi mật khẩu thành công!');
-                document.getElementById('changePasswordError').textContent = '';
-                document.getElementById('changePasswordSuccess').textContent = 'Mật khẩu của bạn đã được cập nhật.';
-                changePasswordFormDiv.style.display = 'none';
-                accountInfoDiv.style.display = 'block';
-                backToAccountInfoButton.style.display = 'none';
-                document.getElementById('currentPassword').value = '';
-                document.getElementById('newPassword').value = '';
-                document.getElementById('confirmNewPassword').value = '';
-            } catch (error) {
-                console.error('Lỗi khi đổi mật khẩu:', error.message);
-                document.getElementById('changePasswordError').textContent = 'Lỗi khi đổi mật khẩu: ' + error.message;
-                document.getElementById('changePasswordSuccess').textContent = '';
-            }
-        });
-
-        // Handle user login
-        const loginSubmitForm = document.getElementById('loginSubmitForm');
-        loginSubmitForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                if (user) {
-                    hideAllForms();
-                    showAccountInfo(user);
-                }
-            } catch (error) {
-                console.error(error.message);
-                document.getElementById('loginError').textContent = 'Đăng nhập thất bại: ' + error.message;
-            }
-        });
-
-        // Handle signup
-        const signupSubmitForm = document.getElementById('signupSubmitForm');
-        signupSubmitForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                alert('Đăng ký thành công!');
-                document.getElementById('signupEmail').value = '';
-                document.getElementById('signupPassword').value = '';
-                hideAllForms();
-                loginFormContainer.style.display = 'block';
-            } catch (error) {
-                console.error(error.message);
-                document.getElementById('signupError').textContent = 'Đăng ký thất bại: ' + error.message;
-            }
-        });
-
-        // Handle password reset
-        const resetSubmitForm = document.getElementById('resetSubmitForm');
-        resetSubmitForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('resetEmail').value;
-            try {
-                await sendPasswordResetEmail(auth, email);
-                alert('Email khôi phục đã được gửi.');
-                document.getElementById('resetEmail').value = '';
-                document.getElementById('resetSuccess').textContent = 'Vui lòng kiểm tra hộp thư đến của bạn.';
-                document.getElementById('resetError').textContent = '';
-            } catch (error) {
-                console.error(error.message);
-                document.getElementById('resetError').textContent = 'Lỗi khi gửi email khôi phục: ' + error.message;
-                document.getElementById('resetSuccess').textContent = '';
-            }
-        });
-
-        // Initially show only the login form
-        hideAllForms();
-        loginFormContainer.style.display = 'block';
-
-        // Check if user is already logged in
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                showAccountInfo(user);
-            } else {
-                hideAllForms();
-                loginFormContainer.style.display = 'block';
-            }
-        });
-    </script>
+// Xử lý chuyển hướng form
+document.querySelectorAll("[data-switch]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const target = btn.getAttribute("data-switch");
+    showSection(target);
+  });
+});
+</script>
 </body>
 </html>
