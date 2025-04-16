@@ -135,6 +135,19 @@
             background-color: #007bff;
         }
 
+        /* Update Email Form */
+        #updateEmailForm {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #updateEmailForm input {
+            width: calc(100% - 12px);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
     </style>
 </head>
 <body>
@@ -202,8 +215,22 @@
             <p>Email của bạn: <span id="currentEmail"></span></p>
             <button id="logoutButton" class="logout">Đăng xuất</button>
             <button id="deleteAccountButton" class="logout">Xóa tài khoản</button>
-            <button id="updateEmailButton" class="updateEmail">Cập nhật email</button>
             <button id="enable2FAButton" class="enable2FA">Bật/Tắt xác thực 2 bước</button>
+            <button id="updateEmailButton" class="updateEmail">Cập nhật email</button>
+        </div>
+
+        <!-- Update Email Form -->
+        <div id="updateEmailForm">
+            <h2>Cập nhật email</h2>
+            <form id="updateEmailSubmitForm">
+                <div class="form-group">
+                    <label for="newEmail">Email mới:</label>
+                    <input type="email" id="newEmail" required>
+                </div>
+                <button type="submit">Cập nhật email</button>
+                <div class="error-message" id="updateEmailError"></div>
+                <div class="success-message" id="updateEmailSuccess"></div>
+            </form>
         </div>
     </div>
 
@@ -226,19 +253,19 @@
 
         const loginContainer = document.getElementById('loginContainer');
         const accountInfo = document.getElementById('accountInfo');
-        const accountEmail = document.getElementById('accountEmail');
-        const currentEmail = document.getElementById('currentEmail');
+        const updateEmailForm = document.getElementById('updateEmailForm');
+        const updateEmailButton = document.getElementById('updateEmailButton');
         const logoutButton = document.getElementById('logoutButton');
         const deleteAccountButton = document.getElementById('deleteAccountButton');
-        const updateEmailButton = document.getElementById('updateEmailButton');
         const enable2FAButton = document.getElementById('enable2FAButton');
+        const newEmailInput = document.getElementById('newEmail');
 
         // Function to show account info
         function showAccountInfo(user) {
             loginContainer.style.display = 'none';
             accountInfo.style.display = 'block';
-            accountEmail.textContent = user.email;
-            currentEmail.textContent = user.email;
+            document.getElementById('accountEmail').textContent = user.email;
+            document.getElementById('currentEmail').textContent = user.email;
         }
 
         // Function to handle user logout
@@ -259,24 +286,31 @@
             }
         });
 
+        // Function to enable/disable 2FA (for simplicity, assume it's just a toggle)
+        enable2FAButton.addEventListener('click', () => {
+            alert('Chức năng xác thực 2 bước chưa được triển khai.');
+        });
+
         // Function to update email
-        updateEmailButton.addEventListener('click', async () => {
-            const newEmail = prompt('Nhập email mới:');
+        updateEmailButton.addEventListener('click', () => {
+            updateEmailForm.style.display = 'block';
+        });
+
+        // Function to handle email update
+        document.getElementById('updateEmailSubmitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newEmail = newEmailInput.value;
             const user = auth.currentUser;
             if (user && newEmail) {
                 try {
                     await updateEmail(user, newEmail);
                     alert('Cập nhật email thành công!');
-                    currentEmail.textContent = newEmail;
+                    document.getElementById('currentEmail').textContent = newEmail;
+                    updateEmailForm.style.display = 'none';
                 } catch (error) {
                     alert('Lỗi khi cập nhật email: ' + error.message);
                 }
             }
-        });
-
-        // Function to enable/disable 2FA (for simplicity, assume it's just a toggle)
-        enable2FAButton.addEventListener('click', () => {
-            alert('Chức năng xác thực 2 bước chưa được triển khai.');
         });
 
         // Handle user login
@@ -296,12 +330,35 @@
             }
         });
 
-        // Show account info if already logged in
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                showAccountInfo(user);
+        // Handle signup
+        const signupForm = document.getElementById('signupSubmitForm');
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert('Đăng ký thành công!');
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPassword').value = '';
+            } catch (error) {
+                console.error(error.message);
+            }
+        });
+
+        // Handle password reset
+        const resetForm = document.getElementById('resetForm');
+        resetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value;
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Email khôi phục đã được gửi.');
+                document.getElementById('resetEmail').value = '';
+            } catch (error) {
+                console.error(error.message);
             }
         });
     </script>
 </body>
-  </html>
+    </html>
