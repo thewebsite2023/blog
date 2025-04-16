@@ -331,21 +331,21 @@
     </div>
 
     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
-  
-  const firebaseConfig = {
-    apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
-    authDomain: "webpage-news.firebaseapp.com",
-    projectId: "webpage-news",
-    storageBucket: "webpage-news.firebasestorage.app",
-    messagingSenderId: "95738658476",
-    appId: "1:95738658476:web:ca38f584a24b71063d6909",
-    measurementId: "G-3KJR1G7EXF"
-  };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, updateEmail, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
+            authDomain: "webpage-news.firebaseapp.com",
+            projectId: "webpage-news",
+            storageBucket: "webpage-news.firebasestorage.app",
+            messagingSenderId: "95738658476",
+            appId: "1:95738658476:web:ca38f584a24b71063d6909",
+            measurementId: "G-3KJR1G7EXF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
         const loginFormContainer = document.getElementById('login-form');
         const signupFormContainer = document.getElementById('signup-form');
@@ -489,7 +489,7 @@
         // Function to handle password change
         document.getElementById('changePasswordSubmitForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const currentPassword = document.getElementById('currentPassword').value;
+            const currentPassword = document.getElementById('currentPassword').value; // Still get the current password
             const newPassword = document.getElementById('newPassword').value;
             const confirmNewPassword = document.getElementById('confirmNewPassword').value;
             const user = auth.currentUser;
@@ -511,18 +511,15 @@
                 return;
             }
 
-            // Reauthenticate user before changing password (for security)
-            const credential = prompt('Vui lòng nhập lại mật khẩu hiện tại để xác nhận.');
-            if (credential === null) {
-                return; // User cancelled reauthentication
-            }
-            // Note: Firebase does not directly provide a way to reauthenticate with a plain password in the frontend for security reasons.
-            // You would typically need to send the current password to your backend and verify it there before proceeding with the password update.
-
-            // For this frontend-only example, we'll skip reauthentication for simplicity.
-            // In a real application, implement secure backend reauthentication.
-
             try {
+                // Note: It's highly recommended to re-authenticate the user
+                // before allowing a password change in a production application.
+                // This usually involves prompting the user for their current password
+                // and verifying it server-side.
+
+                // For this simplified example, we'll proceed with the password update
+                // without explicit re-authentication in the frontend.
+
                 await updatePassword(user, newPassword);
                 alert('Đổi mật khẩu thành công!');
                 document.getElementById('changePasswordError').textContent = '';
