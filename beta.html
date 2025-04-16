@@ -1,220 +1,307 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Blog Cá Nhân</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập, Đăng ký, Quên mật khẩu</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-width: 90%;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 12px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .info-message {
+            color: blue;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .form-navigation {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .form-navigation a {
+            color: #007bff;
+            text-decoration: none;
+            transition: text-decoration 0.3s ease;
+        }
+
+        .form-navigation a:hover {
+            text-decoration: underline;
+        }
+
+        /* New User Account Info Section */
+        #accountInfo {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #accountInfo p {
+            font-size: 1.1em;
+        }
+
+        #accountInfo button {
+            background-color: #dc3545;
+            margin-top: 10px;
+            width: 45%;
+            display: inline-block;
+        }
+
+        #accountInfo button.logout {
+            background-color: #28a745;
+        }
+
+        #accountInfo button.updateEmail {
+            background-color: #ffc107;
+        }
+
+        #accountInfo button.enable2FA {
+            background-color: #007bff;
+        }
+
+    </style>
 </head>
-<body class="text-center p-4">
-  <!-- Đăng nhập -->
-  <div class="container" id="login-box">
-    <h2>Đăng Nhập</h2>
-    <input type="text" id="username" class="form-control mb-2" placeholder="Tên đăng nhập">
-    <input type="password" id="password" class="form-control mb-2" placeholder="Mật khẩu">
-    <button class="btn btn-primary w-100" onclick="login()">Đăng Nhập</button>
-    <p id="error" class="text-danger mt-2"></p>
-  </div>
+<body>
+    <div class="container">
+        <div id="loginContainer">
+            <h2>Đăng nhập</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mật khẩu:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit">Đăng nhập</button>
+                <div class="error-message" id="loginError"></div>
+                <div class="success-message" id="loginSuccess"></div>
+            </form>
+            <div class="form-navigation">
+                <a href="#" id="forgotPasswordLink">Quên mật khẩu?</a> |
+                <a href="#" id="signupLink">Đăng ký</a>
+            </div>
+        </div>
 
-  <!-- Sau khi đăng nhập -->
-  <div id="user-section" class="container d-none">
-    <h2 id="welcome-message"></h2>
-    <button class="btn btn-danger mb-3" onclick="logout()">Đăng Xuất</button>
+        <div id="signupForm">
+            <h2>Đăng ký</h2>
+            <form id="signupSubmitForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email:</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Mật khẩu:</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit">Đăng ký</button>
+                <div class="error-message" id="signupError"></div>
+                <div class="success-message" id="signupSuccess"></div>
+            </form>
+            <div class="form-navigation">
+                <a href="#" id="backToLoginFromSignup">Quay lại đăng nhập</a>
+            </div>
+        </div>
 
-    <div class="mb-2">
-      <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm bài viết..." oninput="loadPosts()">
+        <div id="passwordResetForm">
+            <h2>Khôi phục mật khẩu</h2>
+            <form id="resetForm">
+                <div class="form-group">
+                    <label for="resetEmail">Email:</label>
+                    <input type="email" id="resetEmail" required>
+                </div>
+                <button type="submit">Gửi email khôi phục</button>
+                <div class="error-message" id="resetError"></div>
+                <div class="success-message" id="resetSuccess"></div>
+            </form>
+            <div class="form-navigation">
+                <a href="#" id="backToLoginFromReset">Quay lại đăng nhập</a>
+            </div>
+        </div>
+
+        <!-- User Account Info Section -->
+        <div id="accountInfo">
+            <p>Xin chào, <span id="accountEmail"></span></p>
+            <p>Email của bạn: <span id="currentEmail"></span></p>
+            <button id="logoutButton" class="logout">Đăng xuất</button>
+            <button id="deleteAccountButton" class="logout">Xóa tài khoản</button>
+            <button id="updateEmailButton" class="updateEmail">Cập nhật email</button>
+            <button id="enable2FAButton" class="enable2FA">Bật/Tắt xác thực 2 bước</button>
+        </div>
     </div>
 
-    <textarea id="postContent" class="form-control mb-2" placeholder="Viết bài..."></textarea>
-    <input type="text" id="postTags" class="form-control mb-2" placeholder="Thẻ (tags, cách nhau bằng dấu phẩy)">
-    <input type="text" id="postCategory" class="form-control mb-2" placeholder="Chủ đề (category)">
-    <input type="file" id="postAttachment" class="form-control mb-2" accept="image/*,.pdf,.doc,.docx">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, updateEmail, updateProfile, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-    <button id="postButton" class="btn btn-success mb-3" onclick="submitPost()">Đăng Bài</button>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
+            authDomain: "webpage-news.firebaseapp.com",
+            projectId: "webpage-news",
+            storageBucket: "webpage-news.firebasestorage.app",
+            messagingSenderId: "95738658476",
+            appId: "1:95738658476:web:ca38f584a24b71063d6909",
+            measurementId: "G-3KJR1G7EXF"
+        };
 
-    <div id="posts"></div>
-  </div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const accounts = { "user1": "pass1", "user2": "pass2", "admin": "adminpass" };
-let editingPostId = null;
+        const loginContainer = document.getElementById('loginContainer');
+        const accountInfo = document.getElementById('accountInfo');
+        const accountEmail = document.getElementById('accountEmail');
+        const currentEmail = document.getElementById('currentEmail');
+        const logoutButton = document.getElementById('logoutButton');
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
+        const updateEmailButton = document.getElementById('updateEmailButton');
+        const enable2FAButton = document.getElementById('enable2FAButton');
 
-function login() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  if (accounts[username] && accounts[username] === password) {
-    sessionStorage.setItem("loggedInUser", username);
-    displayUserPage(username);
-  } else {
-    document.getElementById("error").textContent = "Sai tên đăng nhập hoặc mật khẩu!";
-  }
-}
+        // Function to show account info
+        function showAccountInfo(user) {
+            loginContainer.style.display = 'none';
+            accountInfo.style.display = 'block';
+            accountEmail.textContent = user.email;
+            currentEmail.textContent = user.email;
+        }
 
-function displayUserPage(username) {
-  document.getElementById("login-box").classList.add("d-none");
-  document.getElementById("user-section").classList.remove("d-none");
-  document.getElementById("welcome-message").textContent = `Chào mừng, ${username}!`;
-  const savedDraft = sessionStorage.getItem("draft");
-  if (savedDraft) document.getElementById("postContent").value = savedDraft;
-  loadPosts();
-}
+        // Function to handle user logout
+        logoutButton.addEventListener('click', async () => {
+            await signOut(auth);
+            loginContainer.style.display = 'block';
+            accountInfo.style.display = 'none';
+        });
 
-function logout() {
-  sessionStorage.removeItem("loggedInUser");
-  sessionStorage.removeItem("draft");
-  window.location.replace("beta.html");
-}
+        // Function to delete user account
+        deleteAccountButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (user) {
+                await deleteUser(user);
+                alert('Tài khoản đã được xóa.');
+                loginContainer.style.display = 'block';
+                accountInfo.style.display = 'none';
+            }
+        });
 
-function getAllPosts() {
-  let allPosts = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith("posts_")) {
-      const userPosts = JSON.parse(localStorage.getItem(key)) || [];
-      if (Array.isArray(userPosts)) {
-        allPosts = allPosts.concat(userPosts);
-      }
-    }
-  }
-  return allPosts;
-}
+        // Function to update email
+        updateEmailButton.addEventListener('click', async () => {
+            const newEmail = prompt('Nhập email mới:');
+            const user = auth.currentUser;
+            if (user && newEmail) {
+                try {
+                    await updateEmail(user, newEmail);
+                    alert('Cập nhật email thành công!');
+                    currentEmail.textContent = newEmail;
+                } catch (error) {
+                    alert('Lỗi khi cập nhật email: ' + error.message);
+                }
+            }
+        });
 
-function getUserPosts(username) {
-  return JSON.parse(localStorage.getItem(`posts_${username}`)) || [];
-}
+        // Function to enable/disable 2FA (for simplicity, assume it's just a toggle)
+        enable2FAButton.addEventListener('click', () => {
+            alert('Chức năng xác thực 2 bước chưa được triển khai.');
+        });
 
-function saveUserPosts(username, posts) {
-  localStorage.setItem(`posts_${username}`, JSON.stringify(posts));
-}
+        // Handle user login
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                if (user) {
+                    showAccountInfo(user);
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        });
 
-function submitPost() {
-  const content = document.getElementById("postContent").value.trim();
-  const tags = document.getElementById("postTags").value.trim();
-  const category = document.getElementById("postCategory").value.trim();
-  const fileInput = document.getElementById("postAttachment");
-  const file = fileInput.files[0];
-  const user = sessionStorage.getItem("loggedInUser");
-  if (!content) return;
-
-  let posts = getUserPosts(user);
-  let attachmentUrl = null;
-  let attachmentName = null;
-
-  if (file) {
-    attachmentUrl = URL.createObjectURL(file);
-    attachmentName = file.name;
-  }
-
-  if (editingPostId) {
-    posts = posts.map(post => post.id === editingPostId ? {
-      ...post, content, tags, category, attachmentUrl, attachmentName
-    } : post);
-    editingPostId = null;
-    document.getElementById("postButton").textContent = "Đăng Bài";
-  } else {
-    posts.push({
-      id: Date.now(),
-      user,
-      author: user,
-      content,
-      tags,
-      category,
-      attachmentUrl,
-      attachmentName,
-      time: new Date().toLocaleString()
-    });
-  }
-
-  saveUserPosts(user, posts);
-  sessionStorage.removeItem("draft");
-  document.getElementById("postContent").value = "";
-  document.getElementById("postTags").value = "";
-  document.getElementById("postCategory").value = "";
-  fileInput.value = "";
-  loadPosts();
-}
-
-function loadPosts() {
-  let posts = getAllPosts();
-  const postContainer = document.getElementById("posts");
-  const currentUser = sessionStorage.getItem("loggedInUser");
-  const keyword = document.getElementById("searchInput").value.toLowerCase();
-
-  postContainer.innerHTML = "";
-  posts.sort((a, b) => b.id - a.id);
-  posts = posts.filter(post =>
-    post.content.toLowerCase().includes(keyword) ||
-    post.tags?.toLowerCase().includes(keyword) ||
-    post.category?.toLowerCase().includes(keyword)
-  );
-
-  posts.forEach(post => {
-    const postDiv = document.createElement("div");
-    postDiv.classList.add("border", "p-3", "mt-2", "text-start");
-
-    postDiv.innerHTML = `
-      <p><strong>${post.author}</strong> (${post.time})</p>
-      <p>${post.content}</p>
-      <p><small><strong>Chủ đề:</strong> ${post.category || "Không có"} | <strong>Tags:</strong> ${post.tags || "Không có"}</small></p>
-      ${post.attachmentUrl ? `<p><strong>Tệp đính kèm:</strong> <a href="${post.attachmentUrl}" target="_blank">${post.attachmentName}</a></p>` : ""}
-    `;
-
-    if (post.user === currentUser || currentUser === "admin") {
-      const btnGroup = document.createElement("div");
-      btnGroup.classList.add("d-flex", "gap-2");
-
-      const editBtn = document.createElement("button");
-      editBtn.classList.add("btn", "btn-warning");
-      editBtn.textContent = "Sửa";
-      editBtn.onclick = () => editPost(post.id);
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.classList.add("btn", "btn-danger");
-      deleteBtn.textContent = "Xóa";
-      deleteBtn.onclick = () => deletePost(post.id);
-
-      btnGroup.appendChild(editBtn);
-      btnGroup.appendChild(deleteBtn);
-      postDiv.appendChild(btnGroup);
-    }
-
-    postContainer.appendChild(postDiv);
-  });
-}
-
-function deletePost(postId) {
-  const user = sessionStorage.getItem("loggedInUser");
-  let posts = getUserPosts(user);
-  posts = posts.filter(post => post.id !== postId);
-  saveUserPosts(user, posts);
-  loadPosts();
-}
-
-function editPost(postId) {
-  const user = sessionStorage.getItem("loggedInUser");
-  const posts = getUserPosts(user);
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    document.getElementById("postContent").value = post.content;
-    document.getElementById("postTags").value = post.tags || "";
-    document.getElementById("postCategory").value = post.category || "";
-    editingPostId = post.id;
-    document.getElementById("postButton").textContent = "Cập nhật";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-}
-
-document.getElementById("postContent").addEventListener("input", function () {
-  sessionStorage.setItem("draft", this.value);
-});
-
-window.onload = function () {
-  const loggedInUser = sessionStorage.getItem("loggedInUser");
-  if (loggedInUser && accounts[loggedInUser]) {
-    displayUserPage(loggedInUser);
-  }
-};
-  </script>
+        // Show account info if already logged in
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                showAccountInfo(user);
+            }
+        });
+    </script>
 </body>
-        </html>
+  </html>
