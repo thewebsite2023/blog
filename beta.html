@@ -224,7 +224,7 @@
             </div>
         </div>
 
-        <div id="signup-form" style="display: none;">
+        <div id="signup-form">
             <h2>Đăng ký</h2>
             <form id="signupSubmitForm">
                 <div class="form-group">
@@ -316,13 +316,13 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, updateEmail, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
-  authDomain: "webpage-news.firebaseapp.com",
-  projectId: "webpage-news",
-  storageBucket: "webpage-news.firebasestorage.app",
-  messagingSenderId: "95738658476",
-  appId: "1:95738658476:web:ca38f584a24b71063d6909",
-  measurementId: "G-3KJR1G7EXF"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -451,7 +451,7 @@
                 try {
                     await updateEmail(user, newEmail);
                     document.getElementById('updateEmailSuccess').textContent = 'Cập nhật email thành công!';
-                    document.getElementById'updateEmailError').textContent = '';
+                    document.getElementById('updateEmailError').textContent  = '';
                     document.getElementById('currentEmail').textContent = newEmail;
                     setTimeout(() => {
                         hideAllForms();
