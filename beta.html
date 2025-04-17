@@ -538,7 +538,7 @@
                     }
                 }
             } catch (error) {
-                document.getElementById('loginError').textContent = `Đăng nhập thất bại: ${error.message}`;
+                document.getElementById('loginError').textContent = getErrorMessage(error.code);
             }
         });
 
@@ -559,7 +559,7 @@
                     loginFormContainer.style.display = 'block';
                 }, 3000);
             } catch (error) {
-                document.getElementById('signupError').textContent = `Đăng ký thất bại: ${error.message}`;
+                document.getElementById('signupError').textContent = getErrorMessage(error.code);
             } finally {
                 document.getElementById('signupEmail').value = '';
                 document.getElementById('signupPassword').value = '';
@@ -576,7 +576,7 @@
                 await sendPasswordResetEmail(auth, email);
                 document.getElementById('resetSuccess').textContent = 'Email khôi phục mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư đến.';
             } catch (error) {
-                document.getElementById('resetError').textContent = `Lỗi khi gửi email khôi phục: ${error.message}`;
+                document.getElementById('resetError').textContent = getErrorMessage(error.code);
             } finally {
                 document.getElementById('resetEmail').value = '';
             }
@@ -604,6 +604,24 @@
                 loginFormContainer.style.display = 'block';
             }
         });
+        function getErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/user-disabled':
+                    return 'Tài khoản này hiện đang bị khóa.'
+                case 'auth/invalid-email':
+                    return 'Địa chỉ email không hợp lệ.';
+                case 'auth/user-not-found':
+                    return 'Không tìm thấy người dùng với email này.';
+                case 'auth/wrong-password':
+                    return 'Mật khẩu không đúng.';
+                case 'auth/email-already-in-use':
+                    return 'Địa chỉ email này đã được sử dụng.';
+                case 'auth/weak-password':
+                    return 'Mật khẩu quá yếu. Mật khẩu phải có ít nhất 6 ký tự.';
+                default:
+                    return 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+            }
+            }
     </script>
 </body>
 </html>
