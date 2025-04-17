@@ -218,6 +218,34 @@
         #changePasswordForm button:hover {
             background-color: #0056b3;
         }
+
+        /* Account Deleted Section */
+        #accountDeleted {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #accountDeleted p {
+            font-size: 1.1em;
+            color: red;
+            margin-bottom: 15px;
+        }
+
+        #accountDeleted button {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        #accountDeleted button:hover {
+            background-color: #545b62;
+        }
     </style>
 </head>
 <body>
@@ -328,6 +356,11 @@
                 <a id="showAccountInfoFromChangePassword">Quay lại</a>
             </div>
         </div>
+
+        <div id="accountDeleted" style="display: none;">
+            <p class="success-message">Tài khoản đã bị xóa.</p>
+            <button id="backToLoginFromDelete">Quay lại đăng nhập</button>
+        </div>
     </div>
 
     <script type="module">
@@ -353,6 +386,8 @@
         const accountInfoDiv = document.getElementById('accountInfo');
         const updateEmailFormDiv = document.getElementById('updateEmailForm');
         const changePasswordFormDiv = document.getElementById('changePasswordForm');
+        const accountDeletedDiv = document.getElementById('accountDeleted');
+        const backToLoginFromDeleteButton = document.getElementById('backToLoginFromDelete');
 
         const showSignupLink = document.getElementById('showSignupForm');
         const showForgotPasswordLink = document.getElementById('showForgotPasswordForm');
@@ -375,6 +410,7 @@
             accountInfoDiv.style.display = 'none';
             updateEmailFormDiv.style.display = 'none';
             changePasswordFormDiv.style.display = 'none';
+            accountDeletedDiv.style.display = 'none';
         }
 
         // Event listeners for navigation
@@ -422,6 +458,13 @@
             backToAccountInfoButton.style.display = 'none';
         });
 
+        backToLoginFromDeleteButton.addEventListener('click', () => {
+            hideAllForms();
+            loginFormContainer.style.display = 'block';
+            // Prevent going back to the deleted account page
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        });
+
         // Function to show account info and hide other forms
         function showAccountInfo(user) {
             hideAllForms();
@@ -441,16 +484,17 @@
         deleteAccountButton.addEventListener('click', async () => {
             const user = auth.currentUser;
             if (user) {
-                try {
-                    await deleteUser(user);
-                    document.getElementById('accountInfo').innerHTML = '<p class="success-message">Tài khoản đã được xóa.</p>';
-                    setTimeout(() => {
+                if (confirm('Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác.')) {
+                    try {
+                        await deleteUser(user);
                         hideAllForms();
-                        loginFormContainer.style.display = 'block';
-                    }, 2000);
-                }
-                catch (error) {
-                    document.getElementById('accountInfo').innerHTML = '<p class="error-message">Lỗi khi xóa tài khoản: ' + error.message + '</p>';
+                        accountDeletedDiv.style.display = 'block';
+                        // Prevent going back to the account info page after deletion
+                        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    }
+                    catch (error) {
+                        document.getElementById('accountInfo').innerHTML = '<p class="error-message">Lỗi khi xóa tài khoản: ' + error.message + '</p>';
+                    }
                 }
             }
         });
@@ -641,4 +685,4 @@
         });
     </script>
 </body>
-
+</html>
