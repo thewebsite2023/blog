@@ -4,311 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập, Đăng ký, Quên mật khẩu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
-        .body-wrapper {
+        .container-form {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            min-height: 70vh;
         }
-
-        .container {
-            background-color: #fff;
-            padding: 30px;
+        .form-wrapper {
+            border: 1px solid #ccc;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            max-width: 90%;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .form-group {
+            padding: 20px;
             margin-bottom: 15px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f9f9f9;
+            width: 60%;
         }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 0.9em;
+        .navbar-nav-links {
+            display: none; /* Ẩn ban đầu */
         }
-
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"],
-        input[type="text"] {
-            width: calc(100% - 12px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .error-message {
-            color: red;
-            margin-top: 10px;
-            text-align: center;
-            font-size: 0.85em;
-        }
-
-        .success-message {
-            color: green;
-            margin-top: 10px;
-            text-align: center;
-            font-size: 0.85em;
-        }
-
-        .info-message {
-            color: blue;
-            margin-top: 10px;
-            text-align: center;
-            font-size: 0.85em;
-            display: none;
-        }
-
-        .form-navigation {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.9em;
-        }
-
-        .form-navigation a {
-            color: #007bff;
-            text-decoration: none;
-            cursor: pointer;
-            transition: text-decoration 0.3s ease;
-        }
-
-        .form-navigation a:hover {
-            text-decoration: underline;
-        }
-
-        /* Account Info Section */
-        #accountInfo {
-            display: none;
+        .content-area {
             margin-top: 20px;
-            text-align: center;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fff;
         }
-
-        #accountInfo p {
-            font-size: 1.1em;
-        }
-
-        #accountInfo button {
-            margin-top: 10px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
-
-        #accountInfo button.logout {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        #accountInfo button.delete {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        #accountInfo button.changePassword,
-        #accountInfo button.updateEmail {
-            background-color: #007bff;
-            color: white;
-        }
-
-        /* Update Email Form */
-        #updateEmailForm, #changePasswordForm, #forgot-password-form {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #updateEmailForm input, #changePasswordForm input, #forgot-password-form input {
-            width: calc(100% - 12px);
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        #updateEmailForm button, #changePasswordForm button, #forgot-password-form button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
-        }
-
-        #accountDeleted {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        #accountDeleted p {
-            font-size: 1.1em;
-            color: red;
-            margin-bottom: 15px;
-        }
-
-        #accountDeleted button {
-            background-color: #6c757d;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
-
-        #accountDeleted button:hover {
-            background-color: #545b62;
+        .d-none {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="body-wrapper">
-        <div class="container">
-            <div id="login-form">
-                <h2>Đăng nhập</h2>
-                <form id="loginSubmitForm">
-                    <div class="form-group">
-                        <label for="loginEmail">Email:</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Mật khẩu:</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit">Đăng nhập</button>
-                    <div class="error-message" id="loginError"></div>
-                    <div class="success-message" id="loginSuccess"></div>
-                </form>
-                <div class="form-navigation">
-                    <a id="showForgotPasswordForm">Quên mật khẩu?</a> |
-                    <a id="showSignupForm">Đăng ký</a>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse navbar-nav-links" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="mainNavbarLinks">
+                    <li class="nav-item">
+                        <a class="nav-link active show-page" aria-current="page" href="#" data-target="homeContent" id="homeNavLink">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link show-page" href="#" data-target="contentPage" id="contentNavLink">Nội dung trang</a>
+                    </li>
+                    </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="accountDropdownNavbar" style="display: none;">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tài khoản
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                            <li><span class="dropdown-item disabled" id="navbarAccountEmail"></span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button id="logoutNavbarButton" class="dropdown-item">Đăng xuất</button></li>
+                            <li><button data-target="accountInfo" class="dropdown-item show-page">Thông tin tài khoản</button></li>
+                            <li><button data-target="changePasswordForm" class="dropdown-item show-page">Đổi mật khẩu</button></li>
+                            <li><button data-target="updateEmailForm" class="dropdown-item show-page">Cập nhật email</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button id="deleteAccountNavbarButton" class="dropdown-item text-danger">Xóa tài khoản</button></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="homeContent" class="content-area page d-none">
+            <h2>Trang chủ</h2>
+            <p>Đây là nội dung trang chủ mặc định sau khi đăng nhập.</p>
+        </div>
+        <div id="contentPage" class="content-area page d-none">
+            <h2>Nội dung trang</h2>
+            <p>Đây là nội dung của trang khác.</p>
+        </div>
+            <div class="container-form">
+                <div id="login-form" class="form-wrapper page">
+                    <h2 class="text-center mb-3">Đăng nhập</h2>
+                    <form id="loginSubmitForm">
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Mật khẩu:</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                        <div id="loginError" class="mt-2 text-danger text-center"></div>
+                        <div id="loginSuccess" class="mt-2 text-success text-center"></div>
+                        <div class="text-center mt-3">
+                            <a href="#" data-target="forgot-password-form" class="link-primary me-2 show-page">Quên mật khẩu?</a>
+                            <span>|</span>
+                            <a href="#" data-target="signup-form" class="link-primary ms-2 show-page">Đăng ký</a>
+                        </div>
+                    </form>
                 </div>
-            </div>
 
-            <div id="signup-form">
-                <h2>Đăng ký</h2>
-                <form id="signupSubmitForm">
-                    <div class="form-group">
-                        <label for="signupEmail">Email:</label>
-                        <input type="email" id="signupEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Mật khẩu:</label>
-                        <input type="password" id="signupPassword" required>
-                    </div>
-                    <button type="submit">Đăng ký</button>
-                    <div class="error-message" id="signupError"></div>
-                    <div class="success-message" id="signupSuccess"></div>
-                </form>
-                <div class="form-navigation">
-                    <a id="showLoginFormFromSignup">Quay lại đăng nhập</a>
+                <div id="signup-form" class="form-wrapper page d-none">
+                    <h2 class="text-center mb-3">Đăng ký</h2>
+                    <form id="signupSubmitForm">
+                        <div class="mb-3">
+                            <label for="signupEmail" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupPassword" class="form-label">Mật khẩu:</label>
+                            <input type="password" class="form-control" id="signupPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+                        <div id="signupError" class="mt-2 text-danger text-center"></div>
+                        <div id="signupSuccess" class="mt-2 text-success text-center"></div>
+                        <div class="text-center mt-3">
+                            <a href="#" data-target="login-form" class="link-info show-page">Quay lại đăng nhập</a>
+                        </div>
+                    </form>
                 </div>
-            </div>
 
-            <div id="forgot-password-form">
-                <h2>Khôi phục mật khẩu</h2>
-                <form id="resetSubmitForm">
-                    <div class="form-group">
-                        <label for="resetEmail">Email:</label>
-                        <input type="email" id="resetEmail" required>
-                    </div>
-                    <button type="submit">Gửi email khôi phục</button>
-                    <div class="error-message" id="resetError"></div>
-                    <div class="success-message" id="resetSuccess"></div>
-                </form>
-                <div class="form-navigation">
-                    <a id="showLoginFormFromReset">Quay lại đăng nhập</a>
+                <div id="forgot-password-form" class="form-wrapper page d-none">
+                    <h2 class="text-center mb-3">Khôi phục mật khẩu</h2>
+                    <form id="resetSubmitForm">
+                        <div class="mb-3">
+                            <label for="resetEmail" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="resetEmail" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Gửi email khôi phục</button>
+                        <div id="resetError" class="mt-2 text-danger text-center"></div>
+                        <div id="resetSuccess" class="mt-2 text-success text-center"></div>
+                        <div class="text-center mt-3">
+                            <a href="#" data-target="login-form" class="link-info show-page">Quay lại đăng nhập</a>
+                        </div>
+                    </form>
                 </div>
-            </div>
 
-            <div id="accountInfo">
-                <p>Xin chào, <span id="accountEmail"></span></p>
-                <p>Email của bạn: <span id="currentEmail"></span></p>
-                <button id="logoutButton" class="logout">Đăng xuất</button>
-                <button id="deleteAccountButton" class="delete">Xóa tài khoản</button>
-                <button id="changePasswordButton" class="changePassword">Đổi mật khẩu</button>
-                <button id="updateEmailButton" class="updateEmail">Cập nhật email</button>
-            </div>
+                <div id="accountInfo" class="form-wrapper page d-none">
+                    <h2 class="text-center mb-3">Thông tin tài khoản</h2>
+                    <p class="mb-2">Xin chào, <span id="accountEmail" class="fw-bold"></span></p>
+                    <p class="mb-2">Email của bạn: <span id="currentEmail" class="fw-bold"></span></p>
+                    <form id="accountActionsForm"></form>
+                </div>
 
-            <div id="updateEmailForm">
-                <h2>Cập nhật email</h2>
-                <form id="updateEmailSubmitForm">
-                    <div class="form-group">
-                        <label for="newEmail">Email mới:</label>
-                        <input type="email" id="newEmail" required>
-                    </div>
-                    <button type="submit">Cập nhật email</button>
-                    <div class="error-message" id="updateEmailError"></div>
-                    <div class="success-message" id="updateEmailSuccess"></div>
-                </form>
-                <button id="cancelUpdateEmail">Hủy</button>
-            </div>
+                <div id="updateEmailForm" class="form-wrapper page d-none">
+                    <h2 class="text-center mb-3">Cập nhật email</h2>
+                    <form id="updateEmailSubmitForm">
+                        <div class="mb-3">
+                            <label for="newEmail" class="form-label">Email mới:</label>
+                            <input type="email" class="form-control" id="newEmail" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Cập nhật email</button>
+                        <div id="updateEmailError" class="mt-2 text-danger text-center"></div>
+                        <div id="updateEmailSuccess" class="mt-2 text-success text-center"></div>
+                        <div class="text-center mt-3">
+                            <button data-target="accountInfo" class="btn btn-secondary show-page" type="button" id="cancelUpdateEmail">Hủy</button>
+                        </div>
+                    </form>
+                </div>
 
-            <div id="changePasswordForm">
-                <h2>Đổi mật khẩu</h2>
-                <form id="changePasswordSubmitForm">
-                    <div class="form-group">
-                        <label for="currentPassword">Mật khẩu hiện tại:</label>
-                        <input type="password" id="currentPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newPassword">Mật khẩu mới:</label>
-                        <input type="password" id="newPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmNewPassword">Xác nhận mật khẩu mới:</label>
-                        <input type="password" id="confirmNewPassword" required>
-                    </div>
-                    <button type="submit">Đổi mật khẩu</button>
-                    <div class="error-message" id="changePasswordError"></div>
-                    <div class="success-message" id="changePasswordSuccess"></div>
-                </form>
-                <button id="cancelChangePassword">Hủy</button>
-            </div>
+                <div id="changePasswordForm" class="form-wrapper page d-none">
+                    <h2 class="text-center mb-3">Đổi mật khẩu</h2>
+                    <form id="changePasswordSubmitForm">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Mật khẩu hiện tại:</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Mật khẩu mới:</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmNewPassword" class="form-label">Xác nhận mật khẩu mới:</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Đổi mật khẩu</button>
+                        <div id="changePasswordError" class="mt-2 text-danger text-center"></div>
+                        <div id="changePasswordSuccess" class="mt-2 text-success text-center"></div>
+                        <div class="text-center mt-3">
+                            <button data-target="accountInfo" class="btn btn-secondary show-page" type="button" id="cancelChangePassword">Hủy</button>
+                        </div>
+                    </form>
+                </div>
 
-            <div id="accountDeleted">
-                <p class="success-message">Tài khoản đã bị xóa.</p>
-                <button id="backToLoginFromDelete">Quay lại đăng nhập</button>
+                <div id="accountDeleted" class="form-wrapper page d-none">
+                    <h2 class="text-center mb-3 text-danger">Tài khoản đã bị xóa</h2>
+                    <p class="mt-2 text-success text-center">Tài khoản của bạn đã bị xóa thành công.</p>
+                    <div class="text-center mt-3">
+                        <form id="backToLoginFromDeleteForm">
+                            <button data-target="login-form" class="btn btn-info show-page" type="button" id="backToLoginFromDelete">Quay lại đăng nhập</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -317,6 +205,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, updateEmail, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD1Jx3BVxVp0oaX5y2EdPLOmgcau6E8P8M",
             authDomain: "webpage-news.firebaseapp.com",
@@ -327,6 +216,7 @@
             measurementId: "G-3KJR1G7EXF"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
@@ -337,19 +227,60 @@
         const updateEmailFormDiv = document.getElementById('updateEmailForm');
         const changePasswordFormDiv = document.getElementById('changePasswordForm');
         const accountDeletedDiv = document.getElementById('accountDeleted');
-        const backToLoginFromDeleteButton = document.getElementById('backToLoginFromDelete');
-        const cancelUpdateEmailButton = document.getElementById('cancelUpdateEmail');
-        const cancelChangePasswordButton = document.getElementById('cancelChangePassword');
+        const homeContentDiv = document.getElementById('homeContent');
+        const contentPageDiv = document.getElementById('contentPage');
 
-        const showSignupLink = document.getElementById('showSignupForm');
-        const showForgotPasswordLink = document.getElementById('showForgotPasswordForm');
-        const showLoginFormFromSignupLink = document.getElementById('showLoginFormFromSignup');
-        const showLoginFormFromResetLink = document.getElementById('showLoginFormFromReset');
-        const updateEmailButton = document.getElementById('updateEmailButton');
-        const changePasswordButton = document.getElementById('changePasswordButton');
-        const logoutButton = document.getElementById('logoutButton');
-        const deleteAccountButton = document.getElementById('deleteAccountButton');
+        // Các phần tử DOM mới cho navbar
+        const mainNavbarLinks = document.querySelector('.nav-link');
+        const accountDropdownNavbar = document.getElementById('accountDropdownNavbar');
+        const navbarAccountEmail = document.getElementById('navbarAccountEmail');
+        const logoutNavbarButton = document.getElementById('logoutNavbarButton');
+        const deleteAccountNavbarButton = document.getElementById('deleteAccountNavbarButton');
+        const searchForm = document.getElementById('searchForm'); // Giả sử bạn có searchForm
 
+        // Get all elements with the class 'show-form' and 'show-page'
+        const showFormLinks = document.querySelectorAll('.show-form');
+        const showPageLinks = document.querySelectorAll('.show-page');
+        const allPages = document.querySelectorAll('.page');
+
+        // Function to hide all pages
+        function hideAllPages() {
+            allPages.forEach(page => {
+                page.classList.add('d-none');
+            });
+        }
+
+        // Add event listener to each 'show-page' element
+        showPageLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.dataset.target;
+                hideAllPages();
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) {
+                    targetPage.classList.remove('d-none');
+                }
+            });
+        });
+
+// Function to show account info and update navbar
+function showAccountInfo(user) {
+            hideAllPages();
+            // accountInfoDiv.classList.remove('d-none'); // Loại bỏ dòng này để ẩn mặc định
+            homeContentDiv.classList.remove('d-none'); // Hiển thị trang chủ mặc định sau đăng nhập
+            document.getElementById('accountEmail').textContent = user.email || 'Không có email';
+            document.getElementById('currentEmail').textContent = user.email || 'Không có email';
+
+            // Hiển thị các link navbar và dropdown tài khoản, ẩn form đăng nhập/đăng ký
+            mainNavbarLinks.style.display = 'block';
+            accountDropdownNavbar.style.display = 'block';
+            navbarAccountEmail.textContent = user.email || 'Không có email';
+            loginFormContainer.classList.add('d-none');
+            signupFormContainer.classList.add('d-none');
+            forgotPasswordFormContainer.classList.add('d-none');
+        }
+
+        // Function to get error message
         function getErrorMessage(errorCode) {
             switch (errorCode) {
                 case 'auth/user-disabled':
@@ -357,112 +288,101 @@
                 case 'auth/invalid-email':
                     return 'Địa chỉ email không hợp lệ.';
                 case 'auth/user-not-found':
-                    return 'Không tìm thấy người dùng với email này.';
+                    return 'Không tìm thấy người dùng với email này. Nếu bạn chưa có tài khoản, hãy đăng ký ngay!';
                 case 'auth/wrong-password':
                     return 'Mật khẩu không đúng.';
                 case 'auth/email-already-in-use':
                     return 'Địa chỉ email này đã được sử dụng.';
                 case 'auth/weak-password':
                     return 'Mật khẩu quá yếu. Mật khẩu phải có ít nhất 6 ký tự.';
+                case 'auth/invalid-continue-uri': // Thêm xử lý lỗi này (mặc dù nó nên được fix ở cấu hình)
+                    return 'Đường dẫn chuyển hướng không hợp lệ. Vui lòng kiểm tra cấu hình Firebase.';
+                case 'auth/admin-restricted-operation':
+                    return 'Chủ sở hữu dự án đã hạn chế quyền xóa tài khoản. Nếu bạn muốn xóa tài khoản, vui lòng liên hệ với chủ sở hữu để được hỗ trợ xóa tài khoản';
                 default:
                     return 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
             }
         }
 
-        // Function to hide all forms except the one to show
-        function hideAllForms() {
-            loginFormContainer.style.display = 'none';
-            signupFormContainer.style.display = 'none';
-            forgotPasswordFormContainer.style.display = 'none';
-            accountInfoDiv.style.display = 'none';
-            updateEmailFormDiv.style.display = 'none';
-            changePasswordFormDiv.style.display = 'none';
-            accountDeletedDiv.style.display = 'none';
-        }
-
-        // Event listeners for navigation
-        showSignupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            signupFormContainer.style.display = 'block';
-        });
-
-        showForgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            forgotPasswordFormContainer.style.display = 'block';
-        });
-
-        showLoginFormFromSignupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            loginFormContainer.style.display = 'block';
-        });
-
-        showLoginFormFromResetLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            loginFormContainer.style.display = 'block';
-        });
-
-        updateEmailButton.addEventListener('click', () => {
-            hideAllForms();
-            updateEmailFormDiv.style.display = 'block';
-        });
-
-        changePasswordButton.addEventListener('click', () => {
-            hideAllForms();
-            changePasswordFormDiv.style.display = 'block';
-        });
-
-        cancelUpdateEmailButton.addEventListener('click', () => {
-            hideAllForms();
-            accountInfoDiv.style.display = 'block';
-        });
-
-        cancelChangePasswordButton.addEventListener('click', () => {
-            hideAllForms();
-            accountInfoDiv.style.display = 'block';
-        });
-
-        backToLoginFromDeleteButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideAllForms();
-            loginFormContainer.style.display = 'block';
-            // Prevent going back
-            window.history.replaceState(null, null, window.location.pathname + window.location.search);
-        });
-
-        // Function to show account info
-        function showAccountInfo(user) {
-            hideAllForms();
-            accountInfoDiv.style.display = 'block';
-            document.getElementById('accountEmail').textContent = user.email || 'Không có email';
-            document.getElementById('currentEmail').textContent = user.email || 'Không có email';
-        }
-
         // Handle user logout
-        logoutButton.addEventListener('click', async () => {
-            await signOut(auth);
-            hideAllForms();
-            loginFormContainer.style.display ='block';
-        });
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', async () => {
+                await signOut(auth);
+                hideAllPages();
+                loginFormContainer.classList.remove('d-none');
+                mainNavbarLinks.style.display = 'none';
+                accountDropdownNavbar.style.display = 'none';
+                homeContentDiv.classList.add('d-none');
+                if (searchForm) {
+                    searchForm.style.display = 'flex';
+                }
+            });
+        }
+
+        // Handle logout from navbar
+        if (logoutNavbarButton) {
+            logoutNavbarButton.addEventListener('click', async () => {
+                await signOut(auth);
+                hideAllPages();
+                loginFormContainer.classList.remove('d-none');
+                mainNavbarLinks.style.display = 'none';
+                accountDropdownNavbar.style.display = 'none';
+                homeContentDiv.classList.add('d-none');
+                if (searchForm) {
+                    searchForm.style.display = 'flex';
+                }
+            });
+        }
 
         // Handle delete account
-        deleteAccountButton.addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (user && confirm('Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác.')) {
-                try {
-                    await deleteUser(user);
-                    hideAllForms();
-                    accountDeletedDiv.style.display = 'block';
-                    // Prevent going back
-                    window.history.replaceState(null, null, window.location.pathname + window.location.search);
-                } catch (error) {
-                    document.getElementById('accountInfo').innerHTML = `<p class="error-message">Lỗi khi xóa tài khoản: ${getErrorMessage(error.code)}</p>`;
+        const deleteAccountButton = document.getElementById('deleteAccountButton');
+        if (deleteAccountButton) {
+            deleteAccountButton.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                if (user && confirm('Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác.')) {
+                    try {
+                        await deleteUser(user);
+                        hideAllPages();
+                        accountDeletedDiv.classList.remove('d-none');
+                        mainNavbarLinks.style.display = 'none';
+                        accountDropdownNavbar.style.display = 'none';
+                        homeContentDiv.classList.add('d-none');
+                        if (searchForm) {
+                            searchForm.style.display = 'flex';
+                        }
+                        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    } catch (error) {
+                        document.getElementById('accountInfo').innerHTML = `<p class="text-danger text-center mt-2">Lỗi khi xóa tài khoản:</p>` + getErrorMessage(error.code);
+                        console.error("Lỗi khi xóa tài khoản:", error);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        // Handle delete account from navbar
+        if (deleteAccountNavbarButton) {
+            deleteAccountNavbarButton.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                if (user && confirm('Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác.')) {
+                    try {
+                        await deleteUser(user);
+                        hideAllPages();
+                        accountDeletedDiv.classList.remove('d-none');
+                        mainNavbarLinks.style.display = 'none';
+                        accountDropdownNavbar.style.display = 'none';
+                        homeContentDiv.classList.add('d-none');
+                        if (searchForm) {
+                            searchForm.style.display = 'flex';
+                        }
+                        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    } catch (error) {
+                        document.getElementById('accountInfo').innerHTML = `<p class="text-danger text-center mt-2">Lỗi khi xóa tài khoản:</p>` + getErrorMessage(error.code);
+                        console.error("Lỗi khi xóa tài khoản:", error);
+                    }
+                }
+            });
+        }
 
         // Handle update email
         document.getElementById('updateEmailSubmitForm').addEventListener('submit', async (e) => {
@@ -471,20 +391,21 @@
             const user = auth.currentUser;
             if (user) {
                 try {
-                    await updateEmail(user, newEmail);
-                    document.getElementById('updateEmailSuccess').textContent = 'Cập nhật email thành công!';
+                    const actionCodeSettings = {
+                        url: window.location.href, // Sử dụng URL hiện tại
+                        handleCodeInApp: false // Phải là false nếu bạn muốn chuyển hướng đến URL
+                    };
+                    await sendEmailVerification(user, actionCodeSettings);
+                    document.getElementById('updateEmailSuccess').textContent = 'Email xác minh đã được gửi đến ' + newEmail + '. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết để xác minh trước khi email của bạn được cập nhật.';
                     document.getElementById('updateEmailError').textContent = '';
-                    document.getElementById('currentEmail').textContent = newEmail;
-                    setTimeout(() => {
-                        hideAllForms();
-                        accountInfoDiv.style.display = 'block';
-                    }, 2000);
+                    // Optionally disable the update email button or show a waiting message
                 } catch (error) {
-                    document.getElementById('updateEmailError').textContent = getErrorMessage(error.code);
+                    document.getElementById('updateEmailError').textContent = `Lỗi khi gửi email xác minh: ${error.message}`;
                     document.getElementById('updateEmailSuccess').textContent = '';
+                    console.error("Lỗi khi gửi email xác minh:", error);
                 }
             } else {
-                document.getElementById('updateEmailError').textContent = 'Vui lòng nhập email mới.';
+                document.getElementById('updateEmailError').textContent = 'Không có người dùng nào đăng nhập.';
             }
         });
 
@@ -515,7 +436,6 @@
                 document.getElementById('changePasswordError').textContent = 'Vui lòng nhập mật khẩu hiện tại.';
                 return;
             }
-
             const credential = EmailAuthProvider.credential(user.email, currentPassword);
 
             try {
@@ -524,11 +444,16 @@
                 document.getElementById('changePasswordSuccess').textContent = 'Đổi mật khẩu thành công!';
                 document.getElementById('changePasswordError').textContent = '';
                 setTimeout(() => {
-                    hideAllForms();
-                    accountInfoDiv.style.display = 'block';
+                    hideAllPages();
+                    accountInfoDiv.classList.remove('d-none');
                 }, 2000);
             } catch (error) {
-                document.getElementById('changePasswordError').textContent = getErrorMessage(error.code);
+                console.error("Lỗi khi đổi mật khẩu:", error);
+                if (error.code === 'auth/wrong-password') {
+                    document.getElementById('changePasswordError').textContent = 'Mật khẩu hiện tại không đúng.';
+                } else {
+                    document.getElementById('changePasswordError').textContent = getErrorMessage(error.code);
+                }
                 document.getElementById('changePasswordSuccess').textContent = '';
             } finally {
                 document.getElementById('currentPassword').value = '';
@@ -548,15 +473,31 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 if (user) {
+                    await user.reload(); // Reload user data to get the latest emailVerified status
                     if (!user.emailVerified) {
-                        await sendEmailVerification(auth.currentUser);
-                        document.getElementById('loginSuccess').textContent = 'Đăng nhập thành công! Vui lòng kiểm tra email để xác thực tài khoản.';
+                        document.getElementById('loginError').textContent = 'Tài khoản của bạn chưa được xác minh, vui lòng kiểm tra hộp thư để xác minh tài khoản.';
+                        document.getElementById('loginSuccess').textContent = '';
+                        const actionCodeSettings = {
+                            url: window.location.href, // Sử dụng URL hiện tại
+                            handleCodeInApp: true
+                        };
+                        sendEmailVerification(auth.currentUser, actionCodeSettings)
+                            .then(() => {
+                                document.getElementById('loginSuccess').textContent = 'Đã gửi lại email xác minh.';
+                            });
+                        return; // Ngăn chặn đăng nhập nếu email chưa được xác minh
                     } else {
                         showAccountInfo(user);
                     }
                 }
             } catch (error) {
-                document.getElementById('loginError').textContent = getErrorMessage(error.code);
+                console.error("Lỗi khi đăng nhập:", error);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    document.getElementById('loginError').textContent = 'Email hoặc mật khẩu không đúng. Vui lòng thử lại sau.';
+                } else {
+                    document.getElementById('loginError').textContent = getErrorMessage(error.code);
+                }
+                document.getElementById('loginSuccess').textContent = '';
             }
         });
 
@@ -570,13 +511,18 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                await sendEmailVerification(user);
+                const actionCodeSettings = {
+                    url: window.location.href, // Sử dụng URL hiện tại
+                    handleCodeInApp: false
+                };
+                await sendEmailVerification(user, actionCodeSettings);
                 document.getElementById('signupSuccess').textContent = 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.';
                 setTimeout(() => {
-                    hideAllForms();
-                    loginFormContainer.style.display = 'block';
+                    hideAllPages();
+                    loginFormContainer.classList.remove('d-none');
                 }, 3000);
             } catch (error) {
+                console.error("Lỗi khi đăng ký tài khoản:", error);
                 document.getElementById('signupError').textContent = getErrorMessage(error.code);
             } finally {
                 document.getElementById('signupEmail').value = '';
@@ -591,35 +537,60 @@
             document.getElementById('resetError').textContent = '';
             document.getElementById('resetSuccess').textContent = '';
             try {
-                await sendPasswordResetEmail(auth, email);
+                const actionCodeSettings = {
+                    url: window.location.href, // Sử dụng URL hiện tại
+                    handleCodeInApp: false
+                };
+                await sendPasswordResetEmail(auth, email, actionCodeSettings);
                 document.getElementById('resetSuccess').textContent = 'Email khôi phục mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư đến.';
             } catch (error) {
+                console.error("Lỗi khi gửi email khôi phục:", error);
                 document.getElementById('resetError').textContent = getErrorMessage(error.code);
             } finally {
                 document.getElementById('resetEmail').value = '';
             }
         });
 
-        // Initially hide all forms and show login
-        hideAllForms();
-        loginFormContainer.style.display = 'block';
-        forgotPasswordFormContainer.style.display = 'none';
-        accountInfoDiv.style.display = 'none';
-        updateEmailFormDiv.style.display = 'none';
-        changePasswordFormDiv.style.display = 'none';
+        // Initially hide all pages except login form
+        hideAllPages();
+        loginFormContainer.classList.remove('d-none');
+        mainNavbarLinks.style.display = 'none';
+        accountDropdownNavbar.style.display = 'none';
+        homeContentDiv.classList.add('d-none');
+        if (searchForm) {
+            searchForm.style.display = 'flex';
+        }
 
-        // Listen for auth state changes
-        auth.onAuthStateChanged(user => {
-            if (user && user.emailVerified) {
-                showAccountInfo(user);
-            } else if (user && !user.emailVerified) {
-                hideAllForms();
-                loginFormContainer.style.display = 'block';
+        // Listen for auth state changes (để cập nhật trạng thái sau khi xác minh)
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await user.reload(); // Tải lại thông tin người dùng để cập nhật emailVerified
+                if (user.emailVerified) {
+                    showAccountInfo(user);
+                } else {
+                    hideAllPages();
+                    loginFormContainer.classList.remove('d-none');
+                    mainNavbarLinks.style.display = 'none';
+                    accountDropdownNavbar.style.display = 'none';
+                    homeContentDiv.classList.add('d-none');
+                    if (searchForm) {
+                        searchForm.style.display = 'flex';
+                    }
+                    document.getElementById('loginError').textContent = 'Tài khoản của bạn chưa được xác minh, vui lòng kiểm tra hộp thư để xác minh tài khoản.';
+                    document.getElementById('loginSuccess').textContent = '';
+                }
             } else {
-                hideAllForms();
-                loginFormContainer.style.display = 'block';
+                hideAllPages();
+                loginFormContainer.classList.remove('d-none');
+                mainNavbarLinks.style.display = 'none';
+                accountDropdownNavbar.style.display = 'none';
+                homeContentDiv.classList.add('d-none');
+                if (searchForm) {
+                    searchForm.style.display = 'flex';
+                }
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
