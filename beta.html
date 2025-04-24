@@ -231,7 +231,7 @@
         const contentPageDiv = document.getElementById('contentPage');
 
         // Các phần tử DOM mới cho navbar
-        const mainNavbarLinks = document.querySelector('.nav-link');
+        const mainNavbarLinks = document.querySelectorAll('#mainNavbarLinks .nav-link');
         const accountDropdownNavbar = document.getElementById('accountDropdownNavbar');
         const navbarAccountEmail = document.getElementById('navbarAccountEmail');
         const logoutNavbarButton = document.getElementById('logoutNavbarButton');
@@ -270,6 +270,11 @@ function showAccountInfo(user) {
             homeContentDiv.classList.remove('d-none'); // Hiển thị trang chủ mặc định sau đăng nhập
             document.getElementById('accountEmail').textContent = user.email || 'Không có email';
             document.getElementById('currentEmail').textContent = user.email || 'Không có email';
+if (mainNavbarLinks) {
+    mainNavbarLinks.forEach(link => {
+        link.style.display = 'none';
+    });
+}
 
             // Hiển thị các link navbar và dropdown tài khoản, ẩn form đăng nhập/đăng ký
             mainNavbarLinks.style.display = 'block';
